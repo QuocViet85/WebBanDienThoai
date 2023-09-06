@@ -1,0 +1,98 @@
+@model List<Order>
+
+@{
+    string UserName = ViewBag.UserName as string;
+}
+
+@if (Model == null || Model.Count == 0)
+{
+    <h2>Bạn không có đơn hàng nào</h2>
+}
+else
+{
+    <h3>Thông tin đơn hàng của: @UserName</h3>
+    <hr>
+    @foreach (var order in Model)
+    {
+    <div>
+        <dt>Mã đơn hàng: @order.OrderId</dt>
+        <dl class="row">
+            <dt class="col-sm-4">Thông tin khách hàng:</dt>
+            <dd class="col-sm-8">
+                <dl class="row">
+                    <dt class="col-sm-4">Tên khách hàng:</dt>
+                    <dd class="col-sm-8">@order.CustomeName</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4">Địa chỉ nhận hàng:</dt>
+                    <dd class="col-sm-8">@order.Address</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4">Số điện thoại:</dt>
+                    <dd class="col-sm-8">@order.PhoneNumber</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">@order.Email</dd>
+                </dl>
+            </dd>
+        </dl>
+
+        <dl class="row">
+            <dt class="col-sm-4">Thông tin chi tiết:</dt>
+            <dd class="col-sm-8">
+                @foreach (var orderProduct in order.OrderProducts)
+                {
+                    decimal? thanhTien = @orderProduct.Product.Price * @orderProduct.Quantity;
+                    <dl class="row">
+                        <dt class="col-sm-4">Sản phẩm <a asp-action="Detail" asp-route-productslug="@orderProduct.Product.Slug">@orderProduct.Product.Title:</a></dt>
+                        <dd class="col-sm-8">
+                            <p>Giá sản phẩm: @string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", orderProduct.Product.Price) VNĐ</p>
+                            <p>Số lượng: @orderProduct.Quantity</p>
+                            <p>Thành tiền: @string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", thanhTien) VNĐ</p>
+                            <hr>
+                        </dd>
+                    </dl>
+                    }
+
+                @if (order.Vouchers?.Count > 0)
+                {
+                    int totalPercentageDiscount = 0;
+                    
+                    @foreach (var voucher in order.Vouchers)
+                    {
+                        totalPercentageDiscount += @voucher.PercentageDiscount;
+                        <dl class="row">
+                            <dt class="col-sm-4">Voucher giảm giá:</dt>
+                            <dd class="col-sm-8"> 
+                            <p>Mã Voucher: @voucher.VoucherId</p>
+                            <p>Mức giảm giá: @voucher.PercentageDiscount %</p>
+                            <hr>
+                        </dd>
+                        </dl>
+                        <dl class="row">
+                            <dt class="col-sm-4">Tổng mức giảm giá:</dt>
+                            <dd class="col-sm-8">@totalPercentageDiscount %</dd>
+                        </dl>
+                        }
+                }
+                <dl class="row">
+                        <dt class="col-sm-4">Tổng tiền:</dt>
+                        <dd class="col-sm-8">@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", order.Total) VNĐ</dd>
+                </dl>
+            </dd>
+        </dl>
+
+        <dl class="row">
+            <dt class="col-sm-4">Thời điểm đặt hàng:</dt>
+            <dd class="col-sm-8">@order.TimeOrder.ToString("dd/MM/yyyy h:mm:ss tt")</dd>
+        </dl>
+
+        <dl class="row">
+            <dt class="col-sm-4">Tình trạng đơn hàng:</dt>
+            <dd class="col-sm-8">@(order.Completed?"Đã hoàn thành":"Chưa hoàn thành")</dd>
+        </dl>
+    </div>
+    <hr>
+    }
+}

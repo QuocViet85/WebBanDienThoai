@@ -1,0 +1,56 @@
+@model List<Order> 
+
+@{
+    ViewData["Title"] = "Thống kê đơn hàng";
+}
+
+<form asp-action="OrderStatistics" asp-controller="ProductManager" asp-area="Product" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <p>Từ ngày: <input type="date" name="dateTimeFrom"/> &ensp; Đến ngày: <input type="date" name="dateTimeTo"/> &emsp; <button type="submit" class="btn btn-primary" style="">Thống kê</button> </p>
+        </div>
+</form>
+
+@if (Model?.Count > 0)
+{
+    @if((string) @ViewBag.DateTimeFrom == (string) @ViewBag.DateTimeTo)
+    {
+        <h5>Thống kê đơn hàng trong ngày @ViewBag.DateTimeFrom</h5>
+    }
+    else
+    {
+        <h5>Thống kê đơn hàng từ @ViewBag.DateTimeFrom đến @ViewBag.DateTimeTo</h5>
+    }
+
+    <table border="1" style="width: 80%;">
+        <tr>
+            <th>Trạng thái</th>
+            <th>Số lượng đơn hàng</th>
+            <th>Tổng số sản phẩm</th>
+            <th>Tổng số tiền</th>
+        </tr>
+
+        <tr>
+            <td><strong>Tất cả</strong></td>
+            <td>@Model.Count</td>
+            <td>@Model.Sum(o => o.OrderProducts.Sum(op => op.Quantity))</td>
+            <td>@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", @Model.Sum(o => o.Total)) VNĐ</td>
+        </tr>
+
+        <tr>
+            <td><strong>Đã giao</strong></td>
+            <td>@Model.Where(o => o.Completed == true).ToList().Count</td>
+            <td>@Model.Where(o => o.Completed == true).ToList().Sum(o => o.OrderProducts.Sum(op => op.Quantity))</td>
+            <td>@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", @Model.Where(o => o.Completed == true).ToList().Sum(o => o.Total)) VNĐ</td>
+        </tr>
+
+        <tr>
+            <td><strong>Chưa giao</strong></td>
+            <td>@Model.Where(o => o.Completed == false).ToList().Count</td>
+            <td>@Model.Where(o => o.Completed == false).ToList().Sum(o => o.OrderProducts.Sum(op => op.Quantity))</td>
+            <td>@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", @Model.Where(o => o.Completed == false).ToList().Sum(o => o.Total)) VNĐ</td>
+        </tr>
+    </table>
+}
+
+

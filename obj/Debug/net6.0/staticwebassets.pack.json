@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\CNTT\\LearnNET\\DoAnTotNghiep\\WebBanDienThoai\\obj\\Debug\\net6.0\\scopedcss\\projectbundle\\AppMvc.Net.bundle.scp.css",
+      "PackagePath": "staticwebassets\\AppMvc.Net.bundle.scp.css"
+    },
+    {
+      "Id": "D:\\CNTT\\LearnNET\\DoAnTotNghiep\\WebBanDienThoai\\wwwroot\\BocTham.png",
+      "PackagePath": "staticwebassets\\BocTham.png"
+    },
+    {
+      "Id": "D:\\CNTT\\LearnNET\\DoAnTotNghiep\\WebBanDienThoai\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "D:\\CNTT\\LearnNET\\DoAnTotNghiep\\WebBanDienThoai\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "D:\\CNTT\\LearnNET\\DoAnTotNghiep\\WebBanDienThoai\\wwwroot\\js\\site.js",
+      "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.AppMvc.Net.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.build.AppMvc.Net.props",
+      "PackagePath": "build\\AppMvc.Net.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildMultiTargeting.AppMvc.Net.props",
+      "PackagePath": "buildMultiTargeting\\AppMvc.Net.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildTransitive.AppMvc.Net.props",
+      "PackagePath": "buildTransitive\\AppMvc.Net.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -1,0 +1,121 @@
+@model List<ProductModel>
+
+@using App.Components
+
+@{
+    List<CategoryProduct> categories = ViewBag.categories as List<CategoryProduct>;
+    CategoryProduct category = ViewBag.category as CategoryProduct;
+    ViewData["Title"] = (category != null) ? category.Title : "Tất cả các sản phẩm";
+    if (ViewBag.FindProducts)
+    {
+        ViewData["Title"] = "Kết quả tìm kiếm sản phẩm";
+    }
+}
+
+<partial name="_StatusMessage" />
+
+<div>
+    <form asp-action="Index" asp-controller = "ViewProduct" asp-area="Product" method="get" class="d-flex" role="search">
+        <input name="search" value="" class="form-control me-2" type="search" placeholder="Tìm kiếm sản phẩm" aria-label="Search">
+        <button class="btn btn-outline-warning ml-2" type="submit" title="Tìm kiếm"><i class="fas fa-search"></i></button>
+    </form>
+</div>
+
+<!--breadcrumb để hiển thị các danh mục cha của danh mục đang truy cập-->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="~/">Home</a></li>
+    @if (category != null)
+    {
+        var listParents = category.ListParents();
+        foreach (var categoryParent in listParents)
+        {
+            <li class="breadcrumb-item">
+                <a  asp-action="Index" asp-route-categoryslug="@categoryParent.Slug">@categoryParent.Title</a>
+            </li>
+        }
+    }
+  </ol>
+</nav>
+
+<h2>@ViewData["Title"]</h2>
+@if (category != null)
+{
+    <p>@Html.Raw(category.Description)</p>
+}
+else if (ViewBag.FindProducts)
+{
+    <p>Kết quả tìm kiếm sản phẩm với từ khóa: <b>@ViewBag.Search</b></p>
+}
+else 
+{
+    <p>Toàn bộ sản phẩm trong tất cả các danh mục...</p>
+}
+<hr>
+
+<div class="d-flex flex-wrap">
+@foreach (var product in Model)
+{
+    var srcImage = "/contents/nophoto.jpg";
+
+    if (product.Photos.Any())
+    {
+        srcImage = $"/contents/Products/{product.Photos.FirstOrDefault().FileName}";
+    }
+
+    <div class="card mb-2" style="width: 25%; margin-top: 10px; margin-right: 75px;">
+        <img src="@srcImage" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">@product.Title</h5>
+            <p class="card-text">@product.Description</p>
+            <p>
+                <strong class="text-danger">
+                    @product.ProductCategoryProducts.FirstOrDefault()?.CategoryProduct.Title
+                </strong>
+            </p>
+            <p>
+                Giá: <strong>@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", product.Price) VNĐ</strong>  
+            </p>
+            <p>
+                Bảo hành: <strong>@product.GuaranteePeriod năm</strong>
+            </p>
+            <p>
+                @if (@product.Quantity == null || @product.Quantity == 0)
+                {
+                    <span><strong>Hết hàng</strong></span>
+                }
+                else 
+                {
+                    <span>Số lượng: <strong>@product.Quantity</strong></span>
+                }
+            </p>
+        </div>
+        <div class="card-body">
+            <a class="card-link" asp-controller="ViewProduct" asp-action="Detail" asp-route-productslug="@product.Slug">
+                Chi tiết
+            </a>
+            @if(@product.Quantity != null && @product.Quantity != 0)
+            {
+                <a asp-action="AddToCart" asp-controller="ViewProduct" asp-route-productid="@product.ProductID" class="btn btn-primary ml-4">Đặt hàng</a> <!--ml-4 để tạo khoảng cách giữa các phần tử-->
+            }
+        </div>
+    </div>
+}
+</div>
+
+<div>
+    &nbsp;
+</div>
+
+
+@section Sidebar{
+    @await Component.InvokeAsync("App.Components.CategoryProductSidebar", 
+    new CategoryProductSidebar.CategorySidebarData()
+    {
+        Categories = categories,
+        level = 0,
+        categoryslug = ViewBag.categoryslug
+    })
+}
+
+<partial name="_PagingXTL" model="@ViewBag.pagingModel" />

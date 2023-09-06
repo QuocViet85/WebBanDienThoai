@@ -1,0 +1,114 @@
+@using App.Components
+@model App.Models.Product.ProductModel
+
+@{
+    Layout = "_LayoutProductDetail.cshtml";
+    List<CategoryProduct> categories = ViewBag.categories as List<CategoryProduct>;
+    CategoryProduct category = ViewBag.category;
+    ViewData["Title"] = Model.Title;
+    IQueryable<ProductModel> otherProducts = ViewBag.otherProducts as IQueryable<ProductModel>;
+}
+
+<!--breadcrumb để hiển thị các danh mục cha của danh mục đang truy cập-->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="~/">Home</a></li>
+    @if (category != null)
+    {
+        var listParents = category.ListParents();
+        foreach (var categoryParent in listParents)
+        {
+            <li class="breadcrumb-item">
+                <a  asp-action="Index" asp-route-categoryslug="@categoryParent.Slug">@categoryParent.Title</a>
+            </li>
+        }
+        <li class="breadcrumb-item">
+                <a asp-action="Index" asp-route-categoryslug="@category.Slug">@category.Title</a>
+        </li>
+    }
+  </ol>
+</nav>
+
+<div class="detailpost">
+    <h1>@ViewData["Title"]</h1>
+    <div class="sapo">
+        @Model.Description
+    </div>
+    <div>
+        <p>
+            Giá: <strong>@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", Model.Price) VNĐ</strong> 
+        </p>
+        <p>
+            Thời hạn bảo hành: <strong>@Model.GuaranteePeriod năm</strong> 
+        </p>
+        @if (Model.Quantity != null && Model.Quantity != 0)
+        {
+            <p>Số lượng: <strong>@Model.Quantity</strong></p>
+            <p>
+            <a asp-action="AddToCart" asp-controller="ViewProduct" asp-route-productid="@Model.ProductID" class="btn btn-primary">Đặt hàng</a>
+        </p>
+        }
+        else 
+        {
+            <p><strong>Hết hàng</strong></p>
+        }
+    </div>
+    <div>
+        <i>Cập nhật: @Model.DateUpdated</i> 
+    </div>
+
+    @if(Model.Photos.Any())
+    {
+        <div class="d-flex flex-wrap">
+            @foreach (var photo in Model.Photos)
+            {
+                <img class="w-50" src="/contents/Products/@photo.FileName" />
+            }
+        </div>
+    }
+
+    <hr>
+    @Html.Raw(Model.Content)
+</div>
+
+@section Specifications {
+    <h4>Thông số kỹ thuật</h4>
+    <hr>
+
+    @if (Model.ProductAttributeValues?.Count > 0)
+    { 
+        <table border="1">
+            @foreach (var productAttriButeValue in Model.ProductAttributeValues)
+            {
+                <tr style="padding: 10px;">
+                    <td style="background-color: rgb(249, 245, 245);">@productAttriButeValue.ProductAttribute.AttributeName : @productAttriButeValue.AttributeValue</td>
+                </tr>
+            }
+    </table>
+    }
+    else 
+    {
+        <p>Chưa cập nhật...</p>
+    }             
+}
+
+@section Sidebar {
+    @await Component.InvokeAsync("App.Components.CategoryProductSidebar", 
+    new CategoryProductSidebar.CategorySidebarData()
+    {
+        Categories = categories,
+        level = 0,
+        categoryslug = category.Slug
+    })
+
+    <ul class="list-group">
+    @foreach (var product in otherProducts)
+    {
+        <li class="list-group-item">
+            <a asp-controller="ViewProduct" asp-action="Detail" asp-route-productslug="@product.Slug">
+                @product.Title
+            </a>
+        </li>
+    }
+</ul>
+}

@@ -1,0 +1,120 @@
+@model Order
+
+@{
+    Layout = "_Layout";
+    List<CartItem> listCartItems = ViewBag.ListCartItems as List<CartItem>;
+    AppUser user = ViewBag.user as AppUser;
+    int percentageDiscount = ViewBag.PercentageDiscount;
+    string voucherIdsString = ViewBag.VoucherIdsString as string;
+}
+
+<h2>XÁC NHẬN ĐẶT HÀNG</h2>
+<hr>
+<h3>THÔNG TIN ĐƠN HÀNG</h3>
+
+@{
+    int stt = 0;
+    decimal? total = 0;
+}
+
+<table class="table">
+    <tr>
+        <th>#</th>
+        <th>Sản phẩm</th>
+        <th>Giá</th>
+        <th>Số lượng</th>
+        <th>Thành tiền</th>
+    </tr>
+
+    @foreach (var cartitem in listCartItems)
+    {
+        var thanhTien = cartitem.quantity * cartitem.product.Price;
+        total += thanhTien;
+
+        <tr>
+            <td>@(stt + 1)</td>
+            <td>@cartitem.product.Title</td>
+            <td>@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", cartitem.product.Price) VNĐ</td> 
+            <td>@cartitem.quantity</td>
+            <td>@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", thanhTien)</td>  
+        </tr>
+    }
+
+    <tr>
+        <td>
+        @if(percentageDiscount > 0)
+        {
+            <p>Giảm giá (Voucher): @percentageDiscount %</p>
+            total = total * (100- percentageDiscount) / 100;
+        }
+        </td>
+        <td colspan="3" class="text-right">Tổng tiền</td>
+        <td id="total" data-total="@total">@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", total)</td>  
+        <td></td>
+    </tr>
+</table>
+
+<hr>
+
+<h3>THÔNG TIN KHÁCH HÀNG</h3>
+<form method="post" asp-action="OrderConfirm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input style="display: none;" asp-for="@Model.Total" value="@total">
+    <input style="display: none;" name="voucherIdsString" value="@voucherIdsString"/>
+
+    @if (user != null)
+    {
+    <input style="display: none;" asp-for="@Model.UserId" value="@user.Id"/>
+    <div class="form-group">
+        <label asp-for="@Model.CustomeName" class="control-label"></label>
+        <input asp-for="@Model.CustomeName" value="@user.UserName" class="form-control"/>
+        <span asp-validation-for="@Model.CustomeName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="@Model.Address" class="control-label"></label>
+        <input asp-for="@Model.Address" value="@user.HomeAddress" class="form-control"/>
+        <span asp-validation-for="@Model.Address" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="@Model.PhoneNumber" class="control-label"></label>
+        <input asp-for="@Model.PhoneNumber" value="@user.PhoneNumber" class="form-control"/>
+        <span asp-validation-for="@Model.PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="@Model.Email" class="control-label"></label>
+        <input asp-for="@Model.Email" value="@user.Email" class="form-control" />
+        <span asp-validation-for="@Model.Email" class="text-danger"></span>
+    </div>
+    }
+    else 
+    {
+    <div class="form-group">
+        <label asp-for="@Model.CustomeName" class="control-label"></label>
+        <input asp-for="@Model.CustomeName" class="form-control"/>
+        <span asp-validation-for="@Model.CustomeName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="@Model.Address" class="control-label"></label>
+        <input asp-for="@Model.Address" class="form-control"/>
+        <span asp-validation-for="@Model.Address" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="@Model.PhoneNumber" class="control-label"></label>
+        <input asp-for="@Model.PhoneNumber" class="form-control"/>
+        <span asp-validation-for="@Model.PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="@Model.Email" class="control-label"></label>
+        <input asp-for="@Model.Email" class="form-control" />
+        <span asp-validation-for="@Model.Email" class="text-danger"></span>
+    </div>
+    }
+
+    <button type="submit" class="btn btn-success">Xác nhận đặt hàng</button>
+</form>

@@ -1,0 +1,14 @@
+@using Microsoft.AspNetCore.Http
+@inject CartService _cartService
+
+@{
+    var carts = _cartService.GetCartItems();
+    if (carts.Count > 0)
+    {
+        <div class="nav-item">
+            <a class="text-dark" asp-action="Cart" asp-controller="ViewProduct" asp-area="Product" title="Giỏ hàng"><i class="fas fa-shopping-cart">
+            </i>(@carts.Count)
+            </a>
+        </div>
+    }
+}

@@ -1,0 +1,161 @@
+﻿@using App.Models.Product
+@model List<ProductModel>
+
+@{
+    ViewData["Title"] = "Quốc Việt Mobile";
+}
+
+<partial name="_AlertMessage" />
+
+
+<div>
+    <form asp-action="Index" asp-controller = "Home" method="get" class="d-flex" role="search">
+        <input name="search" value="" class="form-control me-2" type="search" placeholder="Tìm kiếm sản phẩm" aria-label="Search">
+        <button class="btn btn-outline-warning ml-2" type="submit" title="Tìm kiếm"><i class="fas fa-search"></i></button>
+    </form>
+</div>
+
+<div>
+    &nbsp;
+</div>
+
+<div>
+
+@if (!ViewBag.FindProducts)
+{
+<div class="text-center">
+    <h4><b>CÁC SẢN PHẨM MỚI NHẤT</b></h4>
+</div>
+}
+else
+{
+<div class="text-center">
+    <h4><b>SẢN PHẨM TÌM ĐƯỢC</b></h4>
+</div>
+}
+
+<div class="d-flex flex-wrap">
+@foreach (var product in Model)
+{
+    @if (product.Quantity > 0)
+    {
+        var srcImage = "/contents/nophoto.jpg";
+    if (product.Photos.Any())
+    {
+        srcImage = $"contents/Products/{product.Photos.FirstOrDefault().FileName}";
+    }
+    <div class="card mb-2" style="width: 20%; margin-top: 10px; margin-left: 40px; margin-right: 20px;">
+        <img src="@srcImage" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">@product.Title</h5>
+            <p class="card-text">@product.Description</p>
+            <p>
+                <strong class="text-danger">
+                    @product.ProductCategoryProducts.FirstOrDefault()?.CategoryProduct.Title
+                </strong>
+            </p>
+            <p>
+                <strong>
+                    @string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", product.Price) VNĐ
+                </strong>
+            </p>
+            <p>
+                Bảo hành: <strong>@product.GuaranteePeriod năm</strong>
+            </p>
+            <p>
+                Số lượng: <strong>@product.Quantity</strong>
+            </p>
+        </div>
+
+        <div class="card-body">
+            <a class="card-link" asp-action="Detail" asp-controller="ViewProduct" asp-route-productslug="@product.Slug" asp-area="Product" >Chi tiết</a>
+                <a asp-action="AddToCart" asp-controller="ViewProduct" asp-route-productid="@product.ProductID" asp-area="Product" class="btn btn-primary ml-4">Đặt hàng</a>
+        </div>
+    </div>
+    }
+}
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* <p>
+    @Url.ActionLink()
+</p>
+
+<p>
+    @Url.Action() <!--Mặc định lấy Url trang hiện tại-->
+</p>
+
+<p>
+    @Url.Action("Privacy") <!--Lấy Url đến action Privacy của controller hiện tại-->
+</p>
+
+<p>
+    @Url.Action("Privacy", new {id = 123, name = "XTL"}) <!--Lấy Url đến action Privacy của controller hiện tại có thêm tham số-->
+</p>
+
+<p>
+    @Url.Action("Jupiter", "Planet") <!--Lấy Url đến action của controller (ở đây là đến action Jupiter của Controller Planet)-->
+</p>
+
+<p>
+    @Url.Action("PlanetInfo", "Planet", new {id = 3}) <!--Lấy Url đến action của controller có thêm tham số (ở đây là đến action Jupiter của Controller Planet)-->
+</p>
+
+<p>
+    @Url.Action("Index", "Product", new {area = "ProductManage", id = 123}) <!--Lấy Url đến action của controller có area-->
+</p>
+
+<p>
+    @Url.RouteUrl("default", new {action = "HelloView", controller = "Home", id = 123, name = "XTL"}) <!--Lấy Url từ tên Route-->
+</p>
+
+<p>
+    @Url.RouteUrl("neptune2") <!--Lấy Url từ tên Route-->
+</p>
+
+<a asp-action="ViewProduct2" asp-route-id="1" asp-controller="First">
+        VI DU 1
+</a>
+<br>
+<a asp-action="PlanetInfo" asp-route-id="3" asp-controller="Planet">
+    VI DU 2
+</a>
+<br>
+<a asp-action="Index" asp-controller="Home"
+    asp-route-name="XTL"
+    asp-route-abc="XYZ"
+    asp-route-id="3">
+    VI DU 3
+</a>
+
+@{
+    var routeData = new Dictionary<string, string>()
+    {
+        {"name", "XTL"},
+        {"abc", "xyz"},
+        {"id", "3"}
+    };
+}
+<br>
+<a asp-action="Index" asp-controller="Product" asp-area="ProductManage" asp-all-route-data="@routeData">
+    VI DU 4
+</a> <!--Sử dụng tagHelper tạo link với nhiều tham số--> *@
+

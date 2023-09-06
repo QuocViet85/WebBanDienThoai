@@ -1,0 +1,139 @@
+@model AppMvc.Areas.Product.Controllers.ProductManagerController.UploadOneFile
+
+@{
+    ProductModel product = ViewData["product"] as ProductModel;
+    Layout = "_Layout";
+}
+
+<h1>Upload photo: @product.Title</h1>
+
+<form method="post" enctype="multipart/form-data"> <!--Để form upload được file thì cần thiết lập thuộc tính enctype="multipart/form-data"-->
+    <label asp-for="FileUpload"></label>
+    <input asp-for="FileUpload" />
+    <span asp-validation-for="FileUpload"></span>
+
+    <button class="btn btn-primary" asp-action="UploadPhoto" asp-route-id="@product.ProductID">Upload</button>
+</form>
+
+<hr>
+
+<input 
+class="collapse"
+type="file"
+id="selectfileupload"
+onchange="AutoUploadPhoto()"
+/> <!--class="collapse" để ẩn phần tử-->
+<span class="btn btn-primary" onclick="ClickButtonUpload()">Uploads</span>
+
+<div id="box-photo-upload" class="d-flex flex-wrap photo-upload" data-id="@product.ProductID">
+</div>
+
+@section Scripts 
+{
+    <script>
+        function AutoUploadPhoto()
+        {
+            var formData = new FormData();
+            var id = $("#box-photo-upload").data("id");
+            formData.append("id", id); //key/value
+
+            var fileData = event.target.files[0]
+
+            formData.append("FileUpload", fileData);
+
+            var urlUpload = "@Url.Action("UploadPhotoApi")";
+
+            $.ajax({
+                data: formData,
+                cache: false,
+                url: urlUpload,
+                type: "POST",
+                contentType: false,
+                processData: false,
+                success: function(data) //dữ liệu lấy được
+                {
+                    LoadPhotos();         
+                }
+            });
+            };
+
+        function ClickButtonUpload()
+        {
+            $("#selectfileupload").click();
+        }
+
+        function setClickDeletePhoto()
+        {
+            $("#box-photo-upload .photodetail span").click(function() {
+                if (confirm("Có chắc chắn xóa ảnh?") != true)
+                {
+                    return;
+                }
+
+                var spanButton = $(this);
+                var id = spanButton.data("id");
+
+            var formData = new FormData();
+            formData.append("id", id); //key/value
+
+            var urlDeletePhoto = "@Url.Action("DeletePhoto")";
+
+            $.ajax({
+                data: formData,
+                cache: false,
+                url: urlDeletePhoto,
+                type: "POST",
+                contentType: false,
+                processData: false,
+                success: function(data) //dữ liệu lấy được
+                {
+                    //...xử lý dữ liệu lấy được
+                    // console.log(data);
+                    LoadPhotos(); //nạp lại các hình ảnh
+                }
+            });
+            });
+        }
+
+        function LoadPhotos()
+        {
+            var box = $("#box-photo-upload");
+            var productID = box.data("id"); //lấy data-id 
+            box.empty(); //xóa phần tử trong box (nếu có)
+
+            var formData = new FormData();
+            formData.append("id", productID); //key/value
+
+            var urlListPhoto = "@Url.Action("ListPhotos")";
+
+            $.ajax({
+                data: formData,
+                cache: false,
+                url: urlListPhoto,
+                type: "POST",
+                contentType: false,
+                processData: false,
+                success: function(data) //dữ liệu lấy được
+                {
+                    //...xử lý dữ liệu lấy được
+                    // console.log(data);
+                    data.photos.forEach(function(item) {
+                        // console.log(item.id);
+                        // console.log(item.path);
+
+                    var e = $('<div class="photodetail w-25 p-1">' 
+                            + '<img class="w-100" src="'+ item.path +'"/>'
+                            + '<span class="btn btn-danger" data-id="'+ item.id +'">Xóa ảnh</span></div>');
+
+                    box.append(e);
+                    });
+                    setClickDeletePhoto();
+                }
+            });
+        };
+
+        $(document).ready(function() {
+            LoadPhotos();
+        });
+    </script>
+}

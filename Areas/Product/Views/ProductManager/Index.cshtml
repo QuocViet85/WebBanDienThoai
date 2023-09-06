@@ -1,0 +1,103 @@
+@model IEnumerable<App.Models.Product.ProductModel>
+
+@{
+    ViewData["Title"] = "Danh mục sản phẩm";
+}
+
+<partial name="_AlertMessage" />
+
+
+<p>
+    <a asp-action="Create">Thêm sản phẩm mới</a>
+</p>
+
+<div>
+    <form asp-action="Index" asp-controller = "ProductManager" asp-area="Product" method="get" class="d-flex" role="search">
+        <input name="search" value="" class="form-control me-2" type="search" placeholder="Tìm kiếm sản phẩm" aria-label="Search">
+        <button class="btn btn-outline-warning ml-2" type="submit" title="Tìm kiếm"><i class="fas fa-search"></i></button>
+    </form>
+</div>
+
+@if (!ViewBag.Search)
+{
+    <p>Tổng số sản phẩm: @ViewBag.totalProducts</p>
+}
+else
+{
+    <p>Tổng số sản phẩm tìm kiếm được với từ khóa <strong>@ViewBag.KeyWord</strong>: @ViewBag.totalProducts</p>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                STT
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Author.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateUpdated)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @(++ViewBag.productIndex)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ProductID">@Html.DisplayFor(modelItem => item.Title)</a> 
+                <br>
+                @{
+                    var categoriesInProduct = item.ProductCategoryProducts.Select(pc => pc.CategoryProduct.Title);
+                    <small>@string.Join(", ", categoriesInProduct)</small>
+                }
+            </td>
+            <td>
+                @string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", item.Price) VNĐ
+            </td>
+            <td>
+                @if (item.Quantity == null || item.Quantity == 0)
+                {
+                    <p>Hết hàng</p>
+                }
+                else 
+                {
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author.UserName)
+            </td>
+            <td>
+                @item.DateCreated?.ToString("dd/MM/yyyy h:mm:ss tt")
+            </td>
+            <td>
+                @item.DateUpdated?.ToString("dd/MM/yyyy h:mm:ss tt")
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.ProductID">Chi tiết</a> |
+                <a asp-action="Delete" asp-route-id="@item.ProductID">Xóa</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<partial name="_PagingXTL" model="@ViewBag.pagingModel" />
+

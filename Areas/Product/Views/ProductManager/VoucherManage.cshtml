@@ -1,0 +1,67 @@
+@model List<Voucher>
+
+@{
+    ViewData["Title"] = "Danh sách voucher";
+}
+
+@if (Model == null || Model.Count == 0)
+{
+    <h2>Không có Voucher nào</h2>
+}
+else 
+{
+    <hr>
+    @foreach (var voucher in Model)
+    {
+        <div>
+            <dl class="row">
+                <dt class="col-sm-4">Mã voucher:</dt>
+                <dd class="col-sm-8">@voucher.VoucherId</dd>
+            </dl>
+            
+            <dl class="row">
+                <dt class="col-sm-4">User sở hữu:</dt>
+                <dd class="col-sm-8">
+                    <dl class="row">
+                        <dt class="col-sm-4">UserId:</dt>
+                        <dd class="col-sm-8">@voucher.UserId</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-sm-4">UserName:</dt>
+                        <dd class="col-sm-8">@voucher.User.UserName</dd>
+                    </dl>
+                </dd>
+            </dl>
+
+            <dl class="row">
+                <dt class="col-sm-4">Phầm trăm giảm giá:</dt>
+                <dd class="col-sm-8">@voucher.PercentageDiscount %</dd>
+            </dl>
+
+            @if(voucher.OrderId != null)
+            {
+                <dl class="row">
+                    <dl class="col-sm-4">Đã thuộc đơn hàng:</dl>
+                    <dd class="col-sm-8">@voucher.OrderId</dd>
+                </dl>
+            }
+
+            <dl class="row">
+                <dt class="col-sm-4">Ngày bốc thăm:</dt>
+                <dd class="col-sm-8">@voucher.LastDrawDate.ToString("dd/MM/yyyy h:mm:ss tt")</dd>
+            </dl>
+
+            <dl class="row">
+                <dt class="col-sm-4">Ngày hết hạn:</dt>
+                <dd class="col-sm-8">@voucher.ExpiredDate.ToString("dd/MM/yyyy h:mm:ss tt")</dd>
+            </dl>
+
+            <form method="POST" asp-action="DeleteVoucher" asp-controller="ProductManager">
+                <input style="display: none;" name="VoucherId" value="@voucher.VoucherId"/>
+                <button type="submit" class="btn btn-danger">Xóa</button>
+            </form>
+            <hr>
+        </div>
+    }
+}
+

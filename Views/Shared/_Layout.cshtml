@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    @* <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css"/> <!--Nạp thư viện font-awesome-->
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script> *@
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" /> <!-- ~ đại diện cho thư mục wwwroot-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/> <!--Nạp thư viện font-awesome-->
+    
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+ 
+ @* navbar-light bg-white *@
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" style="background-color: orange;">
+            <div class="container-fluid">
+                <a class="navbar-brand text-dark" asp-area="" asp-controller="Home" asp-action="Index"><b><i>Quốc Việt Mobile</i></b></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Product" asp-controller="ViewProduct"
+                                asp-action="Index">
+                                <i class="fas fa-laptop"></i> Sản phẩm</a>
+                        </li>
+                        <partial name="_OrderPartial" />
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Product" asp-controller="Voucher"
+                                asp-action="Index">
+                                <i class="far fa-smile-beam"></i>
+                                Bốc thăm trúng thưởng</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Contact" asp-controller="Contact"
+                                asp-action="SendContact">
+                                <i class="fas fa-phone-alt"></i>
+                                Liên hệ</a>
+                        </li>
+                    </ul>
+                    <partial name="_CartPartial" />
+                    <div>
+                        <ul class="navbar-nav flex-grow-1">
+                            <partial name="_AdminPartial" />
+                        </ul>
+                    </div>
+                    <partial name="_LoginPartial" />
+                    
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div style="margin-left: 20px; margin-right: 20px;">
+            @RenderBody()
+    </div>
+        
+    <div>
+           &nbsp;
+    </div>
+    
+    <footer class="border-top footer text-muted" style="background-color: orange;">
+        <p class="text-dark">Địa chỉ: 46A Phố Phạm Ngọc Thạch, quận Đống Đa, thành phố Hà Nội (<a href="https://www.google.com/maps/place/46a+P.Ph%E1%BA%A1m+Ng%E1%BB%8Dc+Th%E1%BA%A1ch,+Trung+T%E1%BB%B1,+%C4%90%E1%BB%91ng+%C4%90a,+H%C3%A0+N%E1%BB%99i+100000,+Vi%E1%BB%87t+Nam/@@21.0104058,105.832521,17z/data=!3m1!4b1!4m6!3m5!1s0x3135ab873583aaab:0xdba903cc5952de74!8m2!3d21.0104008!4d105.8350959!16s%2Fg%2F11p0vr2bdt?hl=vi-VN&entry=ttu">Bản đồ đường đi</a>) | Số điện thoại liên hệ: 0943968969 | Email: phoquocviet@gmail.com</p>
+    </footer>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

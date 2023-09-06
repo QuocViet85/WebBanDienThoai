@@ -1,0 +1,35 @@
+@model IEnumerable<App.Models.Product.ProductAttribute>
+
+@{
+    ViewData["Title"] = "Quản lý thuộc tính sản phẩm";
+    int stt = 1;
+}
+
+<partial name="_AlertMessage" />
+
+<p>
+    <a asp-action="CreateProductAttribute">Thêm thuộc tính mới</a>
+</p>
+
+<table class="table">
+    <tr>
+        <th>Thứ tự</th>
+        <th>Thuộc tính</th>
+    </tr>
+        @foreach (var attr in Model)
+        {
+            <tr>
+            <td>@attr.Sort</td>
+            <td>@attr.AttributeName</td>
+            <td>
+                <a class="btn btn-success btn-sm" asp-action="EditProductAttribute" asp-route-id="@attr.AttributeId">Sửa thuộc tính</a>
+            </td>
+            <td>
+                <form method="POST" asp-action="DeleteProductAttribute">
+                    <input hidden name="AttributeId" value="@attr.AttributeId" />
+                    <button type="submit" class="btn btn-danger">Xóa thuộc tính</button>
+                </form>
+            </td>
+            </tr>
+        }
+</table>

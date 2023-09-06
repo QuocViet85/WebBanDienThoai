@@ -1,0 +1,13 @@
+@inject SignInManager<AppUser> _signInManager
+@inject UserManager<AppUser> _userManager
+
+@if (_signInManager.IsSignedIn(User))
+{
+    var user = await _userManager.GetUserAsync(User);
+
+    <li class="nav-item">
+    <a class="nav-link text-dark" asp-area="Product" asp-controller="ViewProduct" asp-action="OrderInformation" asp-route-UserId="@user.Id">
+    <i class="fas fa-shipping-fast"></i> Đơn hàng của bạn</a>
+    </li>
+}
+

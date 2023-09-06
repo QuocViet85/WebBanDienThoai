@@ -1,0 +1,142 @@
+@model List<Order>
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService _authorizationService
+
+@{
+    ViewData["Title"] = "Danh sách đơn hàng";
+    var checkAdmin = await _authorizationService.AuthorizeAsync(User, "Admin");
+}
+
+@if (Model == null || Model.Count == 0)
+{
+    <h2>Không có đơn hàng nào</h2>
+}
+else
+{
+    @foreach (var order in Model)
+    {
+    <div>
+        <dt>Mã đơn hàng: @order.OrderId</dt>
+        <dl class="row">
+            <dt class="col-sm-4">Thông tin khách hàng:</dt>
+            <dd class="col-sm-8">
+                @if (order.user != null)
+                {
+                    <dl class="row">
+                        <dt class="col-sm-4">UserId:</dt>
+                        <dd class="col-md-8">@order.user.Id</dd>
+                    </dl>
+                }
+                <dl class="row">
+                    <dt class="col-sm-4">Tên khách hàng:</dt>
+                    <dd class="col-sm-8">@order.CustomeName</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4">Địa chỉ nhận hàng:</dt>
+                    <dd class="col-sm-8">@order.Address</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4">Số điện thoại:</dt>
+                    <dd class="col-sm-8">@order.PhoneNumber</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">@order.Email</dd>
+                </dl>
+            </dd>
+        </dl>
+
+       <dl class="row">
+            <dt class="col-sm-4">Thông tin chi tiết:</dt>
+            <dd class="col-sm-8">
+                @foreach (var orderProduct in order.OrderProducts)
+                {
+                    decimal? thanhTien = @orderProduct.Product.Price * @orderProduct.Quantity;
+                    <dl class="row">
+                        <dt class="col-sm-4">Sản phẩm <a asp-action="Details" asp-route-id="@orderProduct.Product.Slug">@orderProduct.Product.Title:</a></dt>
+                        <dd class="col-sm-8">
+                            <p>Giá sản phẩm: @string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", orderProduct.Product.Price) VNĐ</p>
+                            <p>Số lượng: @orderProduct.Quantity</p>
+                            <p>Thành tiền: @string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", thanhTien) VNĐ</p>
+                            <hr>
+                        </dd>
+                    </dl>
+                    }
+                    
+
+                @if (order.Vouchers?.Count > 0)
+                {
+                    int totalPercentageDiscount = 0;
+                    <dl class="row">
+                        <dt class="col-sm-4">Voucher giảm giá:</dt>
+                    @foreach (var voucher in order.Vouchers)
+                    {
+                        @if (voucher.OrderId == order.OrderId)
+                        {
+                        totalPercentageDiscount += voucher.PercentageDiscount;
+                        <dd class="col-sm-8">
+                            <p>Mã Voucher: @voucher.VoucherId</p>
+                            <p>Mức giảm giá: @voucher.PercentageDiscount %</p>
+                            <hr>
+                        </dd>
+                        }
+                    }
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-sm-4">Tổng mức giảm giá:</dt>
+                        <dd class="col-sm-8">@totalPercentageDiscount %</dd>
+                    </dl>    
+                }
+
+                <dl class="row">
+                        <dt class="col-sm-4">Tổng tiền:</dt>
+                        <dd class="col-sm-8">@string.Format(new CultureInfo("vi-VN"), "{0:#,##0}", order.Total) VNĐ</dd>
+                </dl>
+            </dd>
+        </dl>
+
+        <dl class="row">
+            <dt class="col-sm-4">Thời điểm đặt hàng:</dt>
+            <dd class="col-sm-8">@order.TimeOrder.ToString("dd/MM/yyyy h:mm:ss tt")
+        </dl>
+
+        <dl class="row">
+            <dt class="col-sm-4">Tình trạng đơn hàng:</dt>
+            <dd class="col-sm-2">@(order.Completed?"Đã hoàn thành":"Chưa hoàn thành")</dd>
+            @if(!order.Completed)
+            {
+                <form class="col-sm-2" method="POST" asp-action="OrderConfirm" asp-controller="ProductManager">
+                    <input hidden name="CartId" value="@order.OrderId"/>
+                    <input hidden name="Confirmed" value="true"/>
+                    <button type="submit" class="btn btn-success">Hoàn thành</button>
+                </form>
+                <span class="col-sm-1"></span>
+            }
+            else 
+            {
+                if (checkAdmin.Succeeded)
+                {
+                    <form class="col-sm-3" method="POST" asp-action="OrderConfirm" asp-controller="ProductManager">
+                    <input style="display: none;" name="CartId" value="@order.OrderId"/>
+                    <input style="display: none;" name="Confirmed" value="false" />
+                    <button type="submit" class="btn btn-warning">Bỏ hoàn thành</button>
+                    </form>
+                }
+            }
+            <a asp-action="PrintBill" asp-route-CartId = "@order.OrderId" download data-id="@order.OrderId" class="btn btn-info col-sm-2">Xuất hóa đơn</a>
+
+            <form class="col-sm-1" method="POST" asp-action="DeleteOrder" asp-controller="ProductManager">
+                <input style="display: none;" name="CartId" value="@order.OrderId" />
+                <button type="submit" class="btn btn-danger">Xóa</button>
+            </form>
+            </dl>
+            
+    </div>
+    <strong><hr></strong>
+    }
+}
+
+
+
+
+

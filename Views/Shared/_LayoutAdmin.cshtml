@@ -1,0 +1,29 @@
+@{
+    Layout = "_Layout";
+}
+
+<h2 style="text-align: center; color: red;">Trang quản trị Website</h2>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <h3>Các mục quản lý</h3>
+            <hr>
+            <h5><a asp-action="Index" asp-controller="Contact" asp-area="Contact">Quản lý liên hệ</a></h5>
+            <h5><a asp-action="Index" asp-controller="User" asp-area="Identity">Quản lý thành viên (user)</a></h5>
+            <h5><a asp-action="Index" asp-controller="CategoryProduct" asp-area="Product">Quản lý chuyên mục sản phẩm</a></h5>
+            <h5><a asp-action="Create" asp-controller="CategoryProduct" asp-area="Product">Tạo chuyên mục sản phẩm</a></h5>
+            <h5><a asp-action="Index" asp-controller="ProductManager" asp-area="Product">Quản lý sản phẩm</a></h5>
+            <h5><a asp-action="Create" asp-controller="ProductManager" asp-area="Product">Thêm sản phẩm mới</a></h5>
+            <h5><a asp-action="ProductAttributeManage" asp-controller="ProductManager" asp-area="Product">Quản lý thuộc tính sản phẩm</a></h5>
+            <h5><a asp-action="CreateProductAttribute" asp-controller="ProductManager" asp-area="Product">Thêm thuộc tính sản phẩm</a></h5>
+            <h5><a asp-action="OrderManage" asp-controller="ProductManager" asp-area="Product">Quản lý đơn hàng</a></h5>
+            <h5><a asp-action="OrderStatistics" asp-controller="ProductManager" asp-area="Product">Thống kê đơn hàng</a></h5>
+            <h5><a asp-action="VoucherManage" asp-controller="ProductManager" asp-area="Product">Quản lý voucher</a></h5>
+        </div>
+        <div class="col-sm-9">
+            <h3>@ViewData["Title"]</h3>
+            <hr>
+            @RenderBody()
+        </div>
+</div>
+

@@ -1,0 +1,232 @@
+@model App.Areas.Product.Model.CreateProductModel
+
+@{
+    ViewData["Title"] = "Câp nhật sản phẩm";
+    var list = ViewData["categoryProducts"] as MultiSelectList; //MultiSelectList thì chọn được nhiều, SelectList thì chọn được 1
+    List<ProductAttribute> productAttributes = ViewBag.ProductAttribute as List<ProductAttribute>;
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="Edit" asp-controller="ProductManager" asp-area="Product" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input type="hidden" asp-for="ProductID" />
+            <div class="form-group">
+                <label asp-for="categoryIds" class="control-label"></label>
+                <select asp-for="categoryIds" multiple="multiple" asp-items="list" class="w-100" ></select>
+                <span asp-validation-for="categoryIds" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <input 
+                class="collapse"
+                type="file"
+                id="selectfileupload"
+                onchange="AutoUploadPhoto()"
+                /> <!--class="collapse" để ẩn phần tử-->
+            <span class="btn btn-primary" onclick="ClickButtonUpload()">Upload Hình ảnh</span>
+
+            <div id="box-photo-upload" class="d-flex flex-wrap photo-upload" data-id="@Model.ProductID">
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" placeholder="VNĐ"/>
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label"></label>
+                <input asp-for="Quantity" class="form-control" value="@Model.Quantity"/>
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="GuaranteePeriod" class="control-label"></label>
+                <input asp-for="GuaranteePeriod" class="form-control" value="@Model.GuaranteePeriod"/>
+                <span asp-validation-for="GuaranteePeriod" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" ></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DateCreated" class="control-label"></label>
+                <input type="date" asp-for="DateCreated" class="form-control" value="@Model.DateCreated">
+                <span asp-validation-for="DateCreated" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Slug" class="control-label"></label>
+                <input asp-for="Slug" class="form-control" />
+                <span asp-validation-for="Slug" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Content" class="control-label"></label>
+                <textarea asp-for="Content" class="form-control" ></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+
+            <hr>
+            <h3>Thông số kỹ thuật:</h3>
+
+            @if (productAttributes?.Count > 0)
+            {
+                foreach (var attr in productAttributes)
+                {
+                    @if (Model.ProductAttributeValues.Any(pav => pav.AttributeId == attr.AttributeId))
+                    {
+                    string productValue = Model.ProductAttributeValues.Where(pav => pav.AttributeId == attr.AttributeId).Select(pav => pav.AttributeValue).FirstOrDefault();
+                    <div>
+                        <label class="control-label">@attr.AttributeName</label>
+                        <textarea name="@attr.AttributeName" class="form-control">@productValue</textarea>
+                    </div>
+                    }
+                    else
+                    {
+                    <div>
+                        <label class="control-label">@attr.AttributeName</label>
+                        <textarea name="@attr.AttributeName" class="form-control"></textarea>
+                    </div>
+                    }
+                    
+                }
+            }
+            
+            <div class="form-group">
+                <input type="submit" value="Cập nhật" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Danh sách sản phẩm</a>
+</div>
+
+
+    <script>
+        function AutoUploadPhoto()
+        {
+            var formData = new FormData();
+            var id = $("#box-photo-upload").data("id");
+            formData.append("id", id); //key/value
+
+            var fileData = event.target.files[0] //lấy file updload lên
+
+            formData.append("FileUpload", fileData);
+
+            var urlUpload = "@Url.Action("UploadPhotoApi")";
+
+            $.ajax({
+                data: formData,
+                cache: false,
+                url: urlUpload,
+                type: "POST",
+                contentType: false,
+                processData: false,
+                success: function(data) //dữ liệu lấy được
+                {
+                    LoadPhotos();         
+                }
+            });
+        };
+
+        function ClickButtonUpload()
+        {
+            $("#selectfileupload").click();
+        }
+
+        function setClickDeletePhoto()
+        {
+            $("#box-photo-upload .photodetail span").click(function() {
+                if (confirm("Có chắc chắn xóa ảnh?") != true)
+                {
+                    return;
+                }
+
+                var spanButton = $(this);
+                var id = spanButton.data("id");
+
+            var formData = new FormData();
+            formData.append("id", id); //key/value
+
+            var urlDeletePhoto = "@Url.Action("DeletePhoto")";
+
+            $.ajax({
+                data: formData,
+                cache: false,
+                url: urlDeletePhoto,
+                type: "POST",
+                contentType: false,
+                processData: false,
+                success: function(data) //dữ liệu lấy được
+                {
+                    //...xử lý dữ liệu lấy được
+                    // console.log(data);
+                    LoadPhotos(); //nạp lại các hình ảnh
+                }
+            });
+            });
+        }
+
+        function LoadPhotos()
+        {
+            var box = $("#box-photo-upload");
+            var productID = box.data("id"); //lấy data-id 
+            box.empty(); //xóa phần tử trong box (nếu có)
+
+            var formData = new FormData();
+            formData.append("id", productID); //key/value
+
+            var urlListPhoto = "@Url.Action("ListPhotos")";
+
+            $.ajax({
+                data: formData,
+                cache: false,
+                url: urlListPhoto,
+                type: "POST",
+                contentType: false,
+                processData: false,
+                success: function(data) //dữ liệu lấy được
+                {
+                    //...xử lý dữ liệu lấy được
+                    // console.log(data);
+                    data.photos.forEach(function(item) {
+                        // console.log(item.id);
+                        // console.log(item.path);
+
+                    var e = $('<div class="photodetail w-25 p-1">' 
+                            + '<img class="w-100" src="'+ item.path +'"/>'
+                            + '<span class="btn btn-danger" data-id="'+ item.id +'">Xóa ảnh</span></div>');
+
+                    box.append(e);
+                    });
+                    setClickDeletePhoto();
+                }
+            });
+        };
+
+        $(document).ready(function() {
+            LoadPhotos();
+        });
+    </script>
+
+
+@{
+    var summernote = new Summernote("#Content", true)
+    {
+        height = 500
+    };
+}
+
+<partial name="_Summernote" model="summernote" />
+

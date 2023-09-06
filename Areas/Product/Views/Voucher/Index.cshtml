@@ -1,0 +1,66 @@
+@model List<Voucher>
+@{
+    bool SignedIn = ViewBag.SignedIn;
+    bool CanDraw = ViewBag.CanDraw;
+}
+
+<partial name="_StatusMessage" />
+
+@if (!SignedIn)
+{
+    <h3 style="text-align: center;">Hãy <a asp-action="Login" asp-controller="Account" asp-area="Identity">đăng nhập</a> để tham gia trò chơi Bốc thăm trúng thưởng để có cơ hội nhận được Voucher giảm giá khi đặt mua sản phẩm trên Website. Nếu chưa có tài khoản, bạn có thể <a asp-action="Register" asp-controller="Account" asp-area="Identity">đăng kí tài khoản.</a></h3>
+}
+else 
+{
+    if (CanDraw)
+    {
+        <div style="text-align: center;">
+            <img src="/BocTham.png" width="10%" />
+        </div>
+        <form method="POST" asp-action="Random" style="text-align: center;">
+            <button type="submit" class="btn" style="background-color: pink;" >Bốc thăm</button>
+        </form>
+    }
+    else 
+    {
+        <h3 style="text-align: center;">Bạn đã hết lượt bốc thăm trúng thưởng trong ngày hôm nay. Mỗi ngày chỉ được bốc thăm trúng thưởng 1 lần.</h3>
+    }
+
+    @if (Model.Count > 0 && Model.Any(v => v.PercentageDiscount != 0) && (Model.Any(v => v.OrderId == null)))
+    {
+        <hr>
+        <h4 style="color: rgb(232, 22, 22);">Danh sách Voucher trúng thưởng của bạn:</h4>
+    <br>
+    @foreach (var voucher in Model)
+    {
+            if (voucher.PercentageDiscount != 0 && voucher.OrderId == null)
+            {
+                <div>
+                <dl class="row">
+                    <dt class="col-sm-4">Mã voucher:</dt>
+                    <dd class="col-sm-8">@voucher.VoucherId</dd>
+                </dl>
+                
+
+                <dl class="row">
+                    <dt class="col-sm-4">Phầm trăm giảm giá</dt>
+                    <dd class="col-sm-8">@voucher.PercentageDiscount %</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Ngày bốc thăm:</dt>
+                    <dd class="col-sm-8">@voucher.LastDrawDate.ToString("dd/MM/yyyy h:mm:ss tt")</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Ngày hết hạn:</dt>
+                    <dd class="col-sm-8">@voucher.ExpiredDate.ToString("dd/MM/yyyy h:mm:ss tt")</dd>
+                </dl>
+                <hr>
+                </div>
+            }
+        }
+    }
+    
+}
+
